@@ -1,3 +1,9 @@
+let checkThursdayIntervalId;
+let answerElement;
+let diffMillis;
+const today = new Date();
+const thursdayNumber = 4;
+
 function docReady(fn) {
     // see if DOM is already available
     if (document.readyState === "complete" || document.readyState === "interactive") {
@@ -9,26 +15,64 @@ function docReady(fn) {
 }
 
 function checkIfThursdayInterval(intervalInMinutes = 1) {
-    console.log("Checking every " + intervalInMinutes + " minute(s).");
+    console.log("Checking again in " + intervalInMinutes + " minute(s).");
     const timeoutInMilli = intervalInMinutes * 1000 * 60;
-    setInterval(checkIfThursday, timeoutInMilli);
+    checkThursdayIntervalId = setInterval(checkIfThursday, timeoutInMilli);
 }
 
 function checkIfThursday() {
     console.log("Checking if Thursday");
-    const answer = document.getElementById("answer");
-    const date = new Date();
+
     // Is it Thursday yet?
-    if (date.getDay() === 4) {
-        answer.innerText = "Yes";
-    } else if (date.getDay() === 3) {
-        answer.innerText = "Soon";
-    } else {
-        answer.innerText = "Nope";
-    }
+    return today.getDay() === thursdayNumber;
+}
+
+/**
+ * Returns how many milliseconds are from firstDate to the midnight of the passed in dayOfWeek.
+ * @param firstDate
+ * @param dayOfWeek
+ * @returns {number}
+ */
+function timeUntilDayOfWeek(firstDate, dayOfWeek) {
+    const daysUntilDayOfWeek = (dayOfWeek - firstDate.getDay() + 7) % 7 || 7;
+    const nextDayOfWeek = new Date();
+
+    // Set to midnight
+    nextDayOfWeek.setHours(0, 0, 0, 0);
+    // Move forward that many days
+    nextDayOfWeek.setDate(firstDate.getDate() + daysUntilDayOfWeek);
+
+    return nextDayOfWeek.getTime() - firstDate.getTime();
+}
+
+function setText(text) {
+    answerElement.innerText = text;
 }
 
 docReady(() => {
-    checkIfThursday();
-    checkIfThursdayInterval();
+    answerElement = document.getElementById("answer");
+    const isItThursdayYet = checkIfThursday();
+
+    if (isItThursdayYet) {
+        setText("Yes");
+        clearInterval(checkThursdayIntervalId);
+
+        return;
+    }
+
+    diffMillis = timeUntilDayOfWeek(today, thursdayNumber);
+    const checkInMinutes = diffMillis / 1000;
+
+    checkIfThursdayInterval(checkInMinutes);
+
+    setInterval(() => {
+        const days = Math.floor(diffMillis / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diffMillis / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((diffMillis / (1000 * 60)) % 60);
+        const seconds = Math.floor((diffMillis / 1000) % 60);
+
+        setText("There are " + days + " days, " + hours + " hours, " + minutes + " minutes, and " + seconds + " seconds " + " until Thursday");
+
+        diffMillis = diffMillis - 1000;
+    }, 1000);
 });
