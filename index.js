@@ -78,7 +78,6 @@ docReady(() => {
             setText("There are " + days + " days, " + hours + " hours, " + minutes + " minutes, and " + seconds + " seconds " + " until Thursday");
         }
 
-
         diffMillis = diffMillis - 1000;
     }, 1000);
 });
