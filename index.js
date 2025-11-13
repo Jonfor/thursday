@@ -71,11 +71,39 @@ docReady(() => {
         const minutes = Math.floor((diffMillis / (1000 * 60)) % 60);
         const seconds = Math.floor((diffMillis / 1000) % 60);
 
+        let daysText;
+        if (days === 1) {
+            daysText = days + " day, ";
+        } else {
+            daysText = days + " days, ";
+        }
+
+        let hoursText;
+        if (hours === 1) {
+            hoursText = hours + " hour, ";
+        } else {
+            hoursText = hours + " hours, ";
+        }
+
+        let minutesText;
+        if (minutes === 1) {
+            minutesText = minutes + " minute, and ";
+        } else {
+            minutesText = minutes + " minutes, and ";
+        }
+
+        let secondsText;
+        if (seconds === 1) {
+            secondsText = seconds + " second ";
+        } else {
+            secondsText = seconds + " seconds ";
+        }
+
         if (days <= 0 && hours <= 0 && minutes <= 0 && seconds <= 0) {
             clearInterval(countDownIntervalId);
             setText("Yes");
         } else {
-            setText("There are " + days + " days, " + hours + " hours, " + minutes + " minutes, and " + seconds + " seconds " + " until Thursday");
+            setText("There are " + daysText + hoursText + minutesText + secondsText + " until Thursday");
         }
 
         diffMillis = diffMillis - 1000;
