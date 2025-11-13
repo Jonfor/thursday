@@ -1,9 +1,10 @@
 html, body, #container {
-    height: 99%;
+    height: 100vh;
 }
 
 body {
     background-color: #733658;
+    margin: 0;
 }
 
 #container {
