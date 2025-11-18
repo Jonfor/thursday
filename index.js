@@ -103,7 +103,7 @@ docReady(() => {
             clearInterval(countDownIntervalId);
             setText("Yes");
         } else {
-            setText("There are " + daysText + hoursText + minutesText + secondsText + " until Thursday");
+            setText(daysText + hoursText + minutesText + secondsText + " until Thursday");
         }
 
         diffMillis = diffMillis - 1000;
