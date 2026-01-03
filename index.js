@@ -1,28 +1,21 @@
-let checkThursdayIntervalId;
+"use strict";
+
 let answerElement;
-let diffMillis;
+let millisUntil;
 const today = new Date();
 const thursdayNumber = 4;
 
-function docReady(fn) {
+const docReady = (fn) => {
     // see if DOM is already available
     if (document.readyState === "complete" || document.readyState === "interactive") {
         // call on next available tick
         setTimeout(fn, 1);
     } else {
-        document.addEventListener("DOMContentLoaded", fn);
+        document.addEventListener("DOMContentLoaded", fn, false);
     }
 }
 
-function checkIfThursdayInterval(intervalInMinutes = 1) {
-    console.log("Checking again in " + intervalInMinutes + " minute(s).");
-    const timeoutInMilli = intervalInMinutes * 1000 * 60;
-    checkThursdayIntervalId = setInterval(checkIfThursday, timeoutInMilli);
-}
-
-function checkIfThursday() {
-    console.log("Checking if Thursday");
-
+function isItThursdayYet() {
     // Is it Thursday yet?
     return today.getDay() === thursdayNumber;
 }
@@ -33,7 +26,7 @@ function checkIfThursday() {
  * @param dayOfWeek
  * @returns {number}
  */
-function timeUntilDayOfWeek(firstDate, dayOfWeek) {
+function millisUntilDayOfWeek(firstDate, dayOfWeek) {
     const daysUntilDayOfWeek = (dayOfWeek - firstDate.getDay() + 7) % 7 || 7;
     const nextDayOfWeek = new Date();
 
@@ -49,63 +42,62 @@ function setText(text) {
     answerElement.innerText = text;
 }
 
+function buildText() {
+    const days = Math.floor(millisUntil / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((millisUntil / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((millisUntil / (1000 * 60)) % 60);
+    const seconds = Math.floor((millisUntil / 1000) % 60);
+
+    let daysText;
+    if (days === 1) {
+        daysText = days + " day, ";
+    } else {
+        daysText = days + " days, ";
+    }
+
+    let hoursText;
+    if (hours === 1) {
+        hoursText = hours + " hour, ";
+    } else {
+        hoursText = hours + " hours, ";
+    }
+
+    let minutesText;
+    if (minutes === 1) {
+        minutesText = minutes + " minute, and ";
+    } else {
+        minutesText = minutes + " minutes, and ";
+    }
+
+    let secondsText;
+    if (seconds === 1) {
+        secondsText = seconds + " second ";
+    } else {
+        secondsText = seconds + " seconds ";
+    }
+
+    return daysText + hoursText + minutesText + secondsText + " until Thursday";
+}
+
 docReady(() => {
     answerElement = document.getElementById("answer");
-    const isItThursdayYet = checkIfThursday();
 
-    if (isItThursdayYet) {
-        clearInterval(checkThursdayIntervalId);
+    if (isItThursdayYet()) {
         setText("Yes");
-
         return;
     }
 
-    diffMillis = timeUntilDayOfWeek(today, thursdayNumber);
-    const checkInMinutes = diffMillis / 1000;
-
-    checkIfThursdayInterval(checkInMinutes);
+    millisUntil = millisUntilDayOfWeek(today, thursdayNumber);
 
     const countDownIntervalId = setInterval(() => {
-        const days = Math.floor(diffMillis / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diffMillis / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((diffMillis / (1000 * 60)) % 60);
-        const seconds = Math.floor((diffMillis / 1000) % 60);
-
-        let daysText;
-        if (days === 1) {
-            daysText = days + " day, ";
-        } else {
-            daysText = days + " days, ";
-        }
-
-        let hoursText;
-        if (hours === 1) {
-            hoursText = hours + " hour, ";
-        } else {
-            hoursText = hours + " hours, ";
-        }
-
-        let minutesText;
-        if (minutes === 1) {
-            minutesText = minutes + " minute, and ";
-        } else {
-            minutesText = minutes + " minutes, and ";
-        }
-
-        let secondsText;
-        if (seconds === 1) {
-            secondsText = seconds + " second ";
-        } else {
-            secondsText = seconds + " seconds ";
-        }
-
-        if (days <= 0 && hours <= 0 && minutes <= 0 && seconds <= 0) {
+        if (isItThursdayYet()) {
             clearInterval(countDownIntervalId);
             setText("Yes");
         } else {
-            setText(daysText + hoursText + minutesText + secondsText + " until Thursday");
-        }
+            const text = buildText();
+            setText(text);
 
-        diffMillis = diffMillis - 1000;
+            millisUntil = millisUntil - 1000;
+        }
     }, 1000);
 });
