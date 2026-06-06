@@ -42,43 +42,6 @@ function setText(text) {
     answerElement.innerText = text;
 }
 
-function buildText() {
-    const days = Math.floor(millisUntil / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((millisUntil / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((millisUntil / (1000 * 60)) % 60);
-    const seconds = Math.floor((millisUntil / 1000) % 60);
-
-    let daysText;
-    if (days === 1) {
-        daysText = days + " day, ";
-    } else {
-        daysText = days + " days, ";
-    }
-
-    let hoursText;
-    if (hours === 1) {
-        hoursText = hours + " hour, ";
-    } else {
-        hoursText = hours + " hours, ";
-    }
-
-    let minutesText;
-    if (minutes === 1) {
-        minutesText = minutes + " minute, and ";
-    } else {
-        minutesText = minutes + " minutes, and ";
-    }
-
-    let secondsText;
-    if (seconds === 1) {
-        secondsText = seconds + " second ";
-    } else {
-        secondsText = seconds + " seconds ";
-    }
-
-    return daysText + hoursText + minutesText + secondsText + " until Thursday";
-}
-
 docReady(() => {
     answerElement = document.getElementById("answer");
 
@@ -94,7 +57,6 @@ docReady(() => {
             clearInterval(countDownIntervalId);
             setText("Yes");
         } else {
-            const text = buildText();
             setText("No");
 
             millisUntil = millisUntil - 1000;
