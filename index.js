@@ -95,7 +95,7 @@ docReady(() => {
             setText("Yes");
         } else {
             const text = buildText();
-            setText(text);
+            setText("No");
 
             millisUntil = millisUntil - 1000;
         }
