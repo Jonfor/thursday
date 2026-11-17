@@ -1,65 +1,33 @@
 "use strict";
 
-let answerElement;
-let millisUntil;
-const today = new Date();
-const thursdayNumber = 4;
+const THURSDAY = 4;
+const answerElement = document.getElementById("answer");
 
-const docReady = (fn) => {
-    // see if DOM is already available
-    if (document.readyState === "complete" || document.readyState === "interactive") {
-        // call on next available tick
-        setTimeout(fn, 1);
-    } else {
-        document.addEventListener("DOMContentLoaded", fn, false);
-    }
-}
+const isItThursdayYet = () => new Date().getDay() === THURSDAY;
 
-function isItThursdayYet() {
-    // Is it Thursday yet?
-    return today.getDay() === thursdayNumber;
-}
+const render = () => {
+    answerElement.textContent = isItThursdayYet() ? "Yes" : "No";
+};
 
-/**
- * Returns how many milliseconds are from firstDate to the midnight of the passed in dayOfWeek.
- * @param firstDate
- * @param dayOfWeek
- * @returns {number}
- */
-function millisUntilDayOfWeek(firstDate, dayOfWeek) {
-    const daysUntilDayOfWeek = (dayOfWeek - firstDate.getDay() + 7) % 7 || 7;
-    const nextDayOfWeek = new Date();
+const msUntilNextMidnight = () => {
+    const now = new Date();
+    const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    return nextMidnight - now;
+};
 
-    // Set to midnight
-    nextDayOfWeek.setHours(0, 0, 0, 0);
-    // Move forward that many days
-    nextDayOfWeek.setDate(firstDate.getDate() + daysUntilDayOfWeek);
+const scheduleNextRender = () => {
+    // +50ms buffer so we never fire a hair before midnight and render the old day
+    setTimeout(() => {
+        render();
+        scheduleNextRender();
+    }, msUntilNextMidnight() + 50);
+};
 
-    return nextDayOfWeek.getTime() - firstDate.getTime();
-}
+render();
+scheduleNextRender();
 
-function setText(text) {
-    answerElement.innerText = text;
-}
-
-docReady(() => {
-    answerElement = document.getElementById("answer");
-
-    if (isItThursdayYet()) {
-        setText("Yes");
-        return;
-    }
-
-    millisUntil = millisUntilDayOfWeek(today, thursdayNumber);
-
-    const countDownIntervalId = setInterval(() => {
-        if (isItThursdayYet()) {
-            clearInterval(countDownIntervalId);
-            setText("Yes");
-        } else {
-            setText("No");
-
-            millisUntil = millisUntil - 1000;
-        }
-    }, 1000);
+// Timers can be throttled or paused when a tab is backgrounded or the device sleeps,
+// so re-check whenever the tab becomes visible again.
+document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) render();
 });
