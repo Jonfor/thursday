@@ -1,13 +1,19 @@
-html, body, #container {
-    height: 100vh;
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
 }
 
 body {
-    background-color: #733658;
+    height: 100dvh; /* mobile: tracks the visible area, excluding the address bar */
     margin: 0;
+    background-color: #733658;
 }
 
 #container {
+    height: 100%; /* fills the body's content box, so body padding is respected */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -20,7 +26,9 @@ body {
 }
 
 #github-logo {
-    position: fixed; top: 0; right: 0;
+    position: fixed;
+    top: 0;
+    right: 0;
     padding-top: 1rem;
     padding-right: 1rem;
 }
